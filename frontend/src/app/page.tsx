@@ -15,16 +15,21 @@ import { Assignment, AssignmentStatus } from '@/types';
 /* ── Top Bar ─────────────────────────────────────────── */
 function TopBar() {
   return (
-    <header className="top-bar no-print">
-      <div className="flex items-center gap-2 text-sm text-gray-400">
-        <span className="text-gray-400">☰</span>
-        <span className="text-gray-300">/</span>
-        <span className="text-gray-700 font-medium">Assignment</span>
+    <header className="flex items-center justify-between px-6 py-4 border-b border-gray-100 no-print flex-shrink-0">
+      <div className="flex items-center gap-2.5 text-sm font-semibold text-gray-800">
+        <span className="text-gray-400 text-lg cursor-pointer">←</span>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-gray-500">
+          <rect x="3" y="3" width="7" height="7" rx="1" />
+          <rect x="14" y="3" width="7" height="7" rx="1" />
+          <rect x="3" y="14" width="7" height="7" rx="1" />
+          <rect x="14" y="14" width="7" height="7" rx="1" />
+        </svg>
+        <span>Assignment</span>
       </div>
       <div className="flex items-center gap-3">
         <button className="relative p-2 rounded-lg hover:bg-gray-50 transition-colors">
           <Bell className="w-4 h-4 text-gray-500" />
-          <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-orange-500 rounded-full" />
+          <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-[#FF5B35] rounded-full" />
         </button>
         <button className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-gray-50 transition-colors">
           <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-400 to-indigo-500 flex items-center justify-center text-white text-xs font-bold">
@@ -102,17 +107,17 @@ function AssignmentCard({ assignment }: { assignment: Assignment }) {
   const href = `/assignment/${assignment._id}`;
   return (
     <Link href={href} className="block">
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 card-hover cursor-pointer animate-fade-in-up">
+      <div className="bg-white rounded-[16px] border border-gray-100 p-5 card-hover cursor-pointer animate-fade-in-up shadow-sm">
         {/* Header */}
         <div className="flex items-start justify-between gap-2 mb-3">
-          <h3 className="font-semibold text-gray-900 text-sm leading-snug line-clamp-2 flex-1">
+          <h3 className="font-bold text-gray-900 text-base leading-snug line-clamp-2 flex-1">
             {assignment.title}
           </h3>
           <DotMenu assignment={assignment} />
         </div>
 
         {/* Dates */}
-        <div className="flex items-center gap-3 text-[11px] text-gray-400 mb-3">
+        <div className="flex items-center gap-3 text-xs text-gray-400 mb-4">
           <span>
             Assigned on:{' '}
             <span className="text-gray-600 font-medium">
@@ -129,9 +134,9 @@ function AssignmentCard({ assignment }: { assignment: Assignment }) {
         </div>
 
         {/* Footer row */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between pt-2 border-t border-gray-50">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-gray-400 bg-gray-50 border border-gray-100 rounded-lg px-2 py-0.5">
+            <span className="text-[11px] text-gray-500 bg-gray-50 border border-gray-150 rounded-lg px-2.5 py-0.5">
               {assignment.numQuestions} Qs · {assignment.numQuestions * assignment.marksPerQuestion} marks
             </span>
           </div>
@@ -219,16 +224,16 @@ export default function DashboardPage() {
   );
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col h-full bg-white">
       <TopBar />
 
-      <main className="flex-1 flex flex-col p-6">
+      <main className="flex-1 flex flex-col p-6 overflow-y-auto">
         {/* Page header — only when there's content or loading */}
         {(loading || assignments.length > 0 || error) && (
-          <div className="mb-5">
-            <h1 className="text-xl font-bold text-gray-900">Assignments</h1>
-            <p className="text-gray-400 text-sm mt-0.5">
-              Manage created assignments to be your students
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-gray-900">Assignments</h1>
+            <p className="text-gray-400 text-sm mt-1">
+              Manage and create assignments for your classes.
             </p>
           </div>
         )}
@@ -240,14 +245,14 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Filter + New Assignment row */}
+        {/* Filter + Search row */}
         {(loading || assignments.length > 0) && (
-          <div className="flex items-center gap-3 mb-5">
-            <div className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-100 rounded-xl text-sm text-gray-500">
-              <Filter className="w-4 h-4" />
-              Filtering
+          <div className="flex items-center gap-3 mb-6">
+            <div className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-[12px] text-sm font-semibold text-gray-700 hover:bg-gray-50 cursor-pointer shadow-sm">
+              <Filter className="w-4 h-4 text-gray-500" />
+              <span>Filter</span>
             </div>
-            <div className="flex items-center gap-2 flex-1 max-w-xs bg-white border border-gray-100 rounded-xl px-3 py-2">
+            <div className="flex items-center gap-2 flex-1 max-w-sm bg-white border border-gray-200 rounded-[12px] px-3.5 py-2 shadow-sm">
               <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
               <input
                 type="text"
@@ -271,27 +276,31 @@ export default function DashboardPage() {
                 <RefreshCw className="w-4 h-4" />
               </button>
             )}
-            <Link href="/create" className="btn-primary text-sm">
-              <Plus className="w-4 h-4" />
-              New Assignment
-            </Link>
           </div>
         )}
 
         {/* Skeletons */}
         {loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-            {[1,2,3,4,5,6].map(i => <SkeletonCard key={i} />)}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {[1,2,3,4].map(i => <SkeletonCard key={i} />)}
           </div>
         )}
 
         {/* Empty */}
         {!loading && !error && assignments.length === 0 && <EmptyState />}
 
-        {/* Grid */}
+        {/* Grid and bottom center CTA */}
         {!loading && filtered.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-            {filtered.map(a => <AssignmentCard key={a._id} assignment={a} />)}
+          <div className="flex flex-col items-center gap-8 pb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full">
+              {filtered.map(a => <AssignmentCard key={a._id} assignment={a} />)}
+            </div>
+            
+            {/* Centered Pill Button matching Figma */}
+            <Link href="/create" className="btn-primary rounded-full px-6 py-2.5 shadow-md flex items-center gap-2 text-sm bg-black hover:bg-gray-800 text-white font-semibold">
+              <Plus className="w-4 h-4" />
+              Create Assignment
+            </Link>
           </div>
         )}
 
@@ -299,15 +308,6 @@ export default function DashboardPage() {
         {!loading && assignments.length > 0 && filtered.length === 0 && (
           <div className="text-center py-12 text-gray-400 text-sm">
             No assignments match &ldquo;{search}&rdquo;
-          </div>
-        )}
-
-        {/* FAB — visible when there are assignments */}
-        {!loading && assignments.length > 0 && (
-          <div className="fixed bottom-6 right-6 no-print">
-            <Link href="/create" className="btn-primary rounded-full w-12 h-12 !p-0 flex items-center justify-center shadow-lg shadow-gray-900/20">
-              <Plus className="w-5 h-5" />
-            </Link>
           </div>
         )}
       </main>

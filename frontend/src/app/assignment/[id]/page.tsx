@@ -29,23 +29,12 @@ function TopBar({ title, status, completed }: {
   title: string; status: string; completed: boolean;
 }) {
   return (
-    <header className="top-bar no-print">
-      <div className="flex items-center gap-2 text-sm">
-        <Link href="/" className="text-gray-400 hover:text-gray-700 transition-colors flex items-center gap-1">
+    <header className="flex items-center justify-between px-6 py-4 border-b border-gray-100 no-print flex-shrink-0">
+      <div className="flex items-center gap-2 text-sm font-semibold text-gray-800">
+        <Link href="/" className="text-gray-400 hover:text-gray-700 transition-colors flex items-center gap-1.5">
           <span>←</span>
           <span>Assignment</span>
         </Link>
-        {title && (
-          <>
-            <span className="text-gray-300">/</span>
-            <span className="text-gray-700 font-medium truncate max-w-[200px]">{title}</span>
-          </>
-        )}
-        {completed && (
-          <span className="flex items-center gap-1 text-[11px] text-green-600 bg-green-50 border border-green-100 px-2 py-0.5 rounded-full font-medium">
-            <CheckCircle className="w-3 h-3" /> Completed
-          </span>
-        )}
       </div>
       <div className="flex items-center gap-3">
         <button className="relative p-2 rounded-lg hover:bg-gray-50 transition-colors">
@@ -164,18 +153,26 @@ export default function AssignmentOutputPage() {
 
       {/* Action bar — only for completed */}
       {assignment?.status === 'completed' && assignment.questionPaper && (
-        <div className="bg-white border-b border-gray-100 px-6 py-3 flex items-center gap-3 no-print">
-          <div className="flex-1">
-            <p className="text-xs text-gray-400 leading-snug max-w-xl">
-              Ganging, Lacerations are customised question repair for your class.
-              Index a detailed dossier on the recent directions.
+        <div className="bg-[#1A1A2E] px-6 py-5 rounded-[20px] flex flex-col gap-4 m-6 text-white no-print shadow-sm animate-fade-in-up">
+          <div>
+            <p className="text-sm text-gray-200 leading-relaxed font-medium">
+              Certainly, Lakhvinder. Here are customized question paper for your class grade 5 science classes on the NCERT chapters.
             </p>
           </div>
-          <PDFDownloadButton assignment={assignment} questionPaper={assignment.questionPaper} />
-          <button onClick={handleRegenerate} className="btn-secondary py-2 px-4 text-sm">
-            <RefreshCw className="w-4 h-4" />
-            Regenerate
-          </button>
+          <div className="flex items-center gap-3">
+            <PDFDownloadButton
+              assignment={assignment}
+              questionPaper={assignment.questionPaper}
+              className="flex items-center gap-2 px-5 py-2 bg-white hover:bg-gray-100 text-[#1A1A2E] rounded-[12px] text-sm font-semibold shadow-sm transition-colors duration-150 cursor-pointer"
+            />
+            <button
+              onClick={handleRegenerate}
+              className="flex items-center gap-2 px-5 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-[12px] text-sm font-semibold text-white transition-colors duration-150 cursor-pointer"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Regenerate
+            </button>
+          </div>
         </div>
       )}
 

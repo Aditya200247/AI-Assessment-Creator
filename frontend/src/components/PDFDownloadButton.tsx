@@ -355,9 +355,10 @@ function ExamPaperDocument({ assignment, questionPaper }: DocProps) {
 interface ButtonProps {
   assignment: Assignment;
   questionPaper: QuestionPaper;
+  className?: string;
 }
 
-export default function PDFDownloadButton({ assignment, questionPaper }: ButtonProps) {
+export default function PDFDownloadButton({ assignment, questionPaper, className }: ButtonProps) {
   const handleDownload = async () => {
     try {
       const blob = await pdf(
@@ -377,9 +378,9 @@ export default function PDFDownloadButton({ assignment, questionPaper }: ButtonP
   };
 
   return (
-    <button onClick={handleDownload} className="btn-primary py-2.5 px-4 text-sm">
+    <button onClick={handleDownload} className={className || "btn-primary py-2.5 px-4 text-sm"}>
       <Download className="w-4 h-4" />
-      <span className="hidden sm:inline">Download PDF</span>
+      <span>Download as PDF</span>
     </button>
   );
 }

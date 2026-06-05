@@ -15,9 +15,9 @@ import toast from 'react-hot-toast';
 /* ── Top Bar ─────────────────────────────────────────── */
 function TopBar() {
   return (
-    <header className="top-bar no-print">
+    <header className="flex items-center justify-between px-6 py-4 border-b border-gray-100 no-print flex-shrink-0">
       <div className="flex items-center gap-2 text-sm">
-        <Link href="/" className="text-gray-400 hover:text-gray-700 transition-colors flex items-center gap-1">
+        <Link href="/" className="text-gray-400 hover:text-gray-700 transition-colors flex items-center gap-1.5 font-semibold">
           <span>←</span>
           <span>Assignment</span>
         </Link>
@@ -25,7 +25,7 @@ function TopBar() {
       <div className="flex items-center gap-3">
         <button className="relative p-2 rounded-lg hover:bg-gray-50 transition-colors">
           <Bell className="w-4 h-4 text-gray-500" />
-          <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-orange-500 rounded-full" />
+          <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-[#FF5B35] rounded-full" />
         </button>
         <button className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-gray-50 transition-colors">
           <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-400 to-indigo-500 flex items-center justify-center text-white text-xs font-bold">
@@ -363,15 +363,15 @@ export default function CreateAssignmentPage() {
           </div>
 
           {/* ── Navigation ── */}
-          <div className="flex items-center justify-between pb-6">
-            <Link href="/" className="btn-secondary gap-2">
+          <div className="flex items-center justify-between pb-6 mt-4">
+            <Link href="/" className="flex items-center gap-2 px-6 py-2.5 bg-white border border-gray-200 rounded-[12px] text-sm font-semibold text-gray-700 hover:bg-gray-50 shadow-sm transition-colors duration-150">
               <span>←</span> Previous
             </Link>
             <button
               type="submit"
               id="generate-btn"
               disabled={isSubmitting}
-              className="btn-primary px-8 gap-2"
+              className="flex items-center justify-center gap-2 px-8 py-2.5 bg-black hover:bg-gray-800 text-white rounded-[12px] text-sm font-semibold shadow-sm transition-colors duration-150 cursor-pointer disabled:opacity-50"
             >
               {isSubmitting ? (
                 <><Loader2 className="w-4 h-4 animate-spin" /> Generating…</>

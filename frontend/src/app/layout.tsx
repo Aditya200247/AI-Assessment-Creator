@@ -41,13 +41,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             error:   { iconTheme: { primary: '#EF4444', secondary: '#fff' } },
           }}
         />
-        {/* App shell */}
-        <div className="flex min-h-screen">
+        <div className="flex flex-col lg:flex-row h-screen bg-[#F3F4F6] p-4 lg:p-5 gap-4 lg:gap-5 overflow-hidden">
           <Sidebar />
-          {/* Main — offset by sidebar width */}
-          <div className="flex-1 flex flex-col min-h-screen" style={{ marginLeft: '248px' }}>
-            {children}
-          </div>
+          {/* Main — Floating card container */}
+          <main className="flex-1 bg-white rounded-[20px] lg:rounded-[24px] shadow-sm flex flex-col h-full overflow-hidden min-w-0">
+            <div className="flex-1 overflow-y-auto">
+              {children}
+            </div>
+          </main>
         </div>
       </body>
     </html>
