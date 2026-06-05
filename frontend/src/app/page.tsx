@@ -1,192 +1,205 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import {
-  Plus, FileText, Calendar, Hash, Star,
-  Loader2, AlertCircle, RefreshCw, Zap
+  Bell, ChevronDown, Plus, MoreVertical,
+  Loader2, RefreshCw, Search, Filter,
 } from 'lucide-react';
 import { useAssignmentStore } from '@/store/assignmentStore';
 import { getAssignments } from '@/lib/api';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { Assignment, AssignmentStatus } from '@/types';
 
-// Status badge component
-function StatusBadge({ status }: { status: AssignmentStatus }) {
-  if (status === 'pending')
-    return <span className="status-pending"><span className="w-1.5 h-1.5 rounded-full bg-gray-400 inline-block" />Pending</span>;
-  if (status === 'processing')
-    return (
-      <span className="status-processing">
-        <span className="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block animate-pulse" />
-        Generating...
-      </span>
-    );
-  if (status === 'completed')
-    return <span className="status-completed"><span className="w-1.5 h-1.5 rounded-full bg-[#00B894] inline-block" />Completed</span>;
-  return <span className="status-failed"><span className="w-1.5 h-1.5 rounded-full bg-red-500 inline-block" />Failed</span>;
+/* ── Top Bar ─────────────────────────────────────────── */
+function TopBar() {
+  return (
+    <header className="top-bar no-print">
+      <div className="flex items-center gap-2 text-sm text-gray-400">
+        <span className="text-gray-400">☰</span>
+        <span className="text-gray-300">/</span>
+        <span className="text-gray-700 font-medium">Assignment</span>
+      </div>
+      <div className="flex items-center gap-3">
+        <button className="relative p-2 rounded-lg hover:bg-gray-50 transition-colors">
+          <Bell className="w-4 h-4 text-gray-500" />
+          <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-orange-500 rounded-full" />
+        </button>
+        <button className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-gray-50 transition-colors">
+          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-400 to-indigo-500 flex items-center justify-center text-white text-xs font-bold">
+            J
+          </div>
+          <span className="text-sm font-medium text-gray-700">John Doe</span>
+          <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+        </button>
+      </div>
+    </header>
+  );
 }
 
-const STATUS_BORDER: Record<AssignmentStatus, string> = {
-  pending: 'border-l-gray-300',
-  processing: 'border-l-blue-400',
-  completed: 'border-l-[#00B894]',
-  failed: 'border-l-red-400',
-};
-
-// Assignment card component
-function AssignmentCard({ assignment }: { assignment: Assignment }) {
-  const totalMarks = assignment.numQuestions * assignment.marksPerQuestion;
-  const borderColor = STATUS_BORDER[assignment.status];
-
+/* ── Status badge ─────────────────────────────────────── */
+function StatusBadge({ status }: { status: AssignmentStatus }) {
+  if (status === 'processing') return (
+    <span className="status-processing">
+      <span className="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block animate-pulse" />
+      Generating
+    </span>
+  );
+  if (status === 'completed') return (
+    <span className="status-completed">
+      <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
+      Completed
+    </span>
+  );
+  if (status === 'failed') return (
+    <span className="status-failed">
+      <span className="w-1.5 h-1.5 rounded-full bg-red-500 inline-block" />
+      Failed
+    </span>
+  );
   return (
-    <div
-      className={`bg-white rounded-2xl shadow-sm border border-[#E2E8F0] border-l-4 ${borderColor}
-        card-hover p-6 flex flex-col gap-4 animate-fade-in-up`}
-    >
-      {/* Header */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#6C5CE7]/10 flex items-center justify-center flex-shrink-0">
-            <FileText className="w-5 h-5 text-[#6C5CE7]" />
+    <span className="status-pending">
+      <span className="w-1.5 h-1.5 rounded-full bg-gray-400 inline-block" />
+      Pending
+    </span>
+  );
+}
+
+/* ── Dot-menu ─────────────────────────────────────────── */
+function DotMenu({ assignment }: { assignment: Assignment }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="relative">
+      <button
+        onClick={(e) => { e.preventDefault(); setOpen(o => !o); }}
+        className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+      >
+        <MoreVertical className="w-4 h-4 text-gray-400" />
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 top-8 z-20 bg-white rounded-xl shadow-lg border border-gray-100 py-1 w-36 text-sm">
+            {assignment.status === 'completed' && (
+              <Link href={`/assignment/${assignment._id}`}
+                className="block px-4 py-2 text-gray-700 hover:bg-gray-50" onClick={() => setOpen(false)}>
+                View Paper
+              </Link>
+            )}
+            <button className="block w-full text-left px-4 py-2 text-red-500 hover:bg-red-50">
+              Delete
+            </button>
           </div>
-          <div>
-            <h3 className="font-semibold text-[#2D3748] text-base leading-tight line-clamp-1">
-              {assignment.title}
-            </h3>
-            <p className="text-xs text-[#718096] mt-0.5">
-              {assignment.questionTypes.join(' · ')}
-            </p>
-          </div>
-        </div>
-        <StatusBadge status={assignment.status} />
-      </div>
-
-      {/* Meta */}
-      <div className="flex items-center gap-4 text-xs text-[#718096]">
-        <span className="flex items-center gap-1.5">
-          <Calendar className="w-3.5 h-3.5" />
-          {format(new Date(assignment.dueDate), 'MMM d, yyyy')}
-        </span>
-        <span className="flex items-center gap-1.5">
-          <Hash className="w-3.5 h-3.5" />
-          {assignment.numQuestions} questions
-        </span>
-        <span className="flex items-center gap-1.5">
-          <Star className="w-3.5 h-3.5" />
-          {totalMarks} marks
-        </span>
-      </div>
-
-      {/* Created */}
-      <p className="text-xs text-[#A0AEC0]">
-        Created {format(new Date(assignment.createdAt), 'MMM d, yyyy · h:mm a')}
-      </p>
-
-      {/* Actions */}
-      <div className="flex gap-2 pt-1">
-        {assignment.status === 'completed' ? (
-          <Link
-            href={`/assignment/${assignment._id}`}
-            className="btn-primary flex-1 justify-center text-sm py-2.5"
-          >
-            <FileText className="w-4 h-4" />
-            View Paper
-          </Link>
-        ) : assignment.status === 'processing' ? (
-          <Link
-            href={`/assignment/${assignment._id}`}
-            className="btn-outline flex-1 justify-center text-sm py-2.5"
-          >
-            <Loader2 className="w-4 h-4 animate-spin" />
-            View Progress
-          </Link>
-        ) : assignment.status === 'failed' ? (
-          <Link
-            href={`/assignment/${assignment._id}`}
-            className="btn-outline flex-1 justify-center text-sm py-2.5 border-red-300 text-red-500 hover:bg-red-50"
-          >
-            <AlertCircle className="w-4 h-4" />
-            View Details
-          </Link>
-        ) : (
-          <Link
-            href={`/assignment/${assignment._id}`}
-            className="btn-outline flex-1 justify-center text-sm py-2.5"
-          >
-            <Loader2 className="w-4 h-4 animate-spin" />
-            Generating...
-          </Link>
-        )}
-      </div>
+        </>
+      )}
     </div>
   );
 }
 
-// Skeleton loading card
+/* ── Assignment Card ──────────────────────────────────── */
+function AssignmentCard({ assignment }: { assignment: Assignment }) {
+  const href = `/assignment/${assignment._id}`;
+  return (
+    <Link href={href} className="block">
+      <div className="bg-white rounded-2xl border border-gray-100 p-5 card-hover cursor-pointer animate-fade-in-up">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-2 mb-3">
+          <h3 className="font-semibold text-gray-900 text-sm leading-snug line-clamp-2 flex-1">
+            {assignment.title}
+          </h3>
+          <DotMenu assignment={assignment} />
+        </div>
+
+        {/* Dates */}
+        <div className="flex items-center gap-3 text-[11px] text-gray-400 mb-3">
+          <span>
+            Assigned on:{' '}
+            <span className="text-gray-600 font-medium">
+              {format(new Date(assignment.createdAt), 'dd-MM-yyyy')}
+            </span>
+          </span>
+          <span className="text-gray-200">|</span>
+          <span>
+            Due:{' '}
+            <span className="text-gray-600 font-medium">
+              {format(new Date(assignment.dueDate), 'dd-MM-yyyy')}
+            </span>
+          </span>
+        </div>
+
+        {/* Footer row */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] text-gray-400 bg-gray-50 border border-gray-100 rounded-lg px-2 py-0.5">
+              {assignment.numQuestions} Qs · {assignment.numQuestions * assignment.marksPerQuestion} marks
+            </span>
+          </div>
+          <StatusBadge status={assignment.status} />
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+/* ── Skeleton card ────────────────────────────────────── */
 function SkeletonCard() {
   return (
-    <div className="bg-white rounded-2xl border border-[#E2E8F0] p-6 flex flex-col gap-4">
-      <div className="flex items-start gap-3">
-        <div className="skeleton w-10 h-10 rounded-xl" />
-        <div className="flex-1 flex flex-col gap-2">
-          <div className="skeleton h-4 w-3/4 rounded" />
-          <div className="skeleton h-3 w-1/2 rounded" />
-        </div>
-        <div className="skeleton h-6 w-20 rounded-full" />
+    <div className="bg-white rounded-2xl border border-gray-100 p-5 flex flex-col gap-3">
+      <div className="flex items-start gap-2">
+        <div className="skeleton h-4 flex-1 rounded" />
+        <div className="skeleton w-5 h-5 rounded" />
       </div>
-      <div className="flex gap-4">
-        <div className="skeleton h-3 w-20 rounded" />
-        <div className="skeleton h-3 w-16 rounded" />
-        <div className="skeleton h-3 w-16 rounded" />
+      <div className="skeleton h-3 w-2/3 rounded" />
+      <div className="flex items-center justify-between">
+        <div className="skeleton h-5 w-24 rounded-lg" />
+        <div className="skeleton h-5 w-16 rounded-full" />
       </div>
-      <div className="skeleton h-3 w-32 rounded" />
-      <div className="skeleton h-9 w-full rounded-xl" />
     </div>
   );
 }
 
-// Empty state
+/* ── Empty state ─────────────────────────────────────── */
 function EmptyState() {
   return (
-    <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
+    <div className="flex flex-col items-center justify-center flex-1 py-20 px-4 text-center">
       <div className="animate-float mb-8">
-        <svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="80" cy="80" r="72" fill="#6C5CE7" fillOpacity="0.08" />
-          <rect x="48" y="36" width="64" height="84" rx="8" fill="white" stroke="#E2E8F0" strokeWidth="2"/>
-          <rect x="58" y="52" width="44" height="4" rx="2" fill="#E2E8F0"/>
-          <rect x="58" y="64" width="36" height="4" rx="2" fill="#E2E8F0"/>
-          <rect x="58" y="76" width="40" height="4" rx="2" fill="#E2E8F0"/>
-          <rect x="58" y="88" width="28" height="4" rx="2" fill="#E2E8F0"/>
-          <circle cx="112" cy="44" r="20" fill="#6C5CE7"/>
-          <path d="M104 44l5 5 9-9" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-          <circle cx="48" cy="112" r="8" fill="#00CEC9" fillOpacity="0.6"/>
-          <circle cx="120" cy="100" r="5" fill="#FDCB6E" fillOpacity="0.8"/>
+        {/* Magnifying glass with X illustration */}
+        <svg width="140" height="140" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="70" cy="70" r="70" fill="#F4F5F7"/>
+          {/* Magnifying glass */}
+          <circle cx="58" cy="56" r="28" fill="white" stroke="#E8EAED" strokeWidth="3"/>
+          <circle cx="58" cy="56" r="22" fill="#F9FAFB" stroke="#E8EAED" strokeWidth="2"/>
+          {/* Handle */}
+          <line x1="78" y1="76" x2="96" y2="96" stroke="#D1D5DB" strokeWidth="7" strokeLinecap="round"/>
+          {/* X mark */}
+          <circle cx="58" cy="56" r="13" fill="#FEE2E2"/>
+          <line x1="52" y1="50" x2="64" y2="62" stroke="#EF4444" strokeWidth="3" strokeLinecap="round"/>
+          <line x1="64" y1="50" x2="52" y2="62" stroke="#EF4444" strokeWidth="3" strokeLinecap="round"/>
         </svg>
       </div>
-      <h2 className="text-2xl font-bold text-[#2D3748] mb-3">No assignments yet</h2>
-      <p className="text-[#718096] max-w-sm mb-8 leading-relaxed">
-        Create your first AI-powered question paper in seconds. Just fill in the details and let the AI do the work.
+      <h2 className="text-xl font-bold text-gray-900 mb-2">No assignments yet</h2>
+      <p className="text-gray-500 text-sm max-w-xs leading-relaxed mb-8">
+        Create your first assignment to start collecting and grading student submissions.
+        You can set up rubrics, define marking criteria, and let AI assist with grading.
       </p>
-      <Link href="/create" className="btn-primary text-base px-8 py-3.5">
-        <Plus className="w-5 h-5" />
-        Create Assignment
+      <Link href="/create" className="btn-primary px-6 py-3 text-sm">
+        <Plus className="w-4 h-4" />
+        Create Your First Assignment
       </Link>
     </div>
   );
 }
 
-// Dashboard
+/* ── Dashboard ───────────────────────────────────────── */
 export default function DashboardPage() {
-  const { assignments, loading, error, setAssignments, setLoading, setError } =
-    useAssignmentStore();
+  const { assignments, loading, error, setAssignments, setLoading, setError } = useAssignmentStore();
+  const [search, setSearch] = useState('');
 
-  // Listen to global WS events for status updates
   useWebSocket({});
 
   useEffect(() => {
-    async function loadAssignments() {
+    async function load() {
       try {
         setLoading(true);
         setError(null);
@@ -198,86 +211,103 @@ export default function DashboardPage() {
         setLoading(false);
       }
     }
-    loadAssignments();
+    load();
   }, [setAssignments, setLoading, setError]);
 
-  return (
-    <div className="min-h-screen bg-[#F8F9FE]">
-      {/* Navbar */}
-      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-[#E2E8F0]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#6C5CE7] to-[#a29bfe] flex items-center justify-center shadow-lg shadow-[#6C5CE7]/25">
-              <Zap className="w-5 h-5 text-white fill-white" />
-            </div>
-            <div>
-              <span className="font-bold text-[#2D3748] text-lg leading-none">VedaAI</span>
-              <p className="text-[10px] text-[#718096] leading-none mt-0.5">AI Assessment Creator</p>
-            </div>
-          </div>
-          <Link href="/create" className="btn-primary">
-            <Plus className="w-4 h-4" />
-            New Assignment
-          </Link>
-        </div>
-      </header>
+  const filtered = assignments.filter(a =>
+    a.title.toLowerCase().includes(search.toLowerCase())
+  );
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        {/* Page header */}
+  return (
+    <div className="flex flex-col min-h-screen">
+      <TopBar />
+
+      <main className="flex-1 flex flex-col p-6">
+        {/* Page header — only when there's content or loading */}
         {(loading || assignments.length > 0 || error) && (
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-2xl font-bold text-[#2D3748]">My Assignments</h1>
-              <p className="text-[#718096] text-sm mt-1">
-                {assignments.length > 0
-                  ? `${assignments.length} assignment${assignments.length !== 1 ? 's' : ''} created`
-                  : 'Manage your AI-generated question papers'}
-              </p>
+          <div className="mb-5">
+            <h1 className="text-xl font-bold text-gray-900">Assignments</h1>
+            <p className="text-gray-400 text-sm mt-0.5">
+              Manage created assignments to be your students
+            </p>
+          </div>
+        )}
+
+        {/* Error */}
+        {error && (
+          <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 mb-5 text-sm">
+            {error}
+          </div>
+        )}
+
+        {/* Filter + New Assignment row */}
+        {(loading || assignments.length > 0) && (
+          <div className="flex items-center gap-3 mb-5">
+            <div className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-100 rounded-xl text-sm text-gray-500">
+              <Filter className="w-4 h-4" />
+              Filtering
             </div>
+            <div className="flex items-center gap-2 flex-1 max-w-xs bg-white border border-gray-100 rounded-xl px-3 py-2">
+              <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              <input
+                type="text"
+                placeholder="Search assignment..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="flex-1 outline-none text-sm text-gray-700 placeholder:text-gray-400 bg-transparent"
+              />
+            </div>
+            <div className="flex-1" />
             {!loading && (
               <button
                 onClick={async () => {
                   setLoading(true);
-                  try {
-                    const data = await getAssignments();
-                    setAssignments(data);
-                  } finally {
-                    setLoading(false);
-                  }
+                  try { const d = await getAssignments(); setAssignments(d); }
+                  finally { setLoading(false); }
                 }}
-                className="btn-secondary py-2 px-4 text-sm"
+                className="btn-ghost p-2"
+                title="Refresh"
               >
                 <RefreshCw className="w-4 h-4" />
-                Refresh
               </button>
             )}
+            <Link href="/create" className="btn-primary text-sm">
+              <Plus className="w-4 h-4" />
+              New Assignment
+            </Link>
           </div>
         )}
 
-        {/* Error state */}
-        {error && (
-          <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-2xl text-red-600 mb-6">
-            <AlertCircle className="w-5 h-5 flex-shrink-0" />
-            <p className="text-sm">{error}</p>
-          </div>
-        )}
-
-        {/* Loading skeletons */}
+        {/* Skeletons */}
         {loading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((i) => <SkeletonCard key={i} />)}
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+            {[1,2,3,4,5,6].map(i => <SkeletonCard key={i} />)}
           </div>
         )}
 
-        {/* Empty state */}
+        {/* Empty */}
         {!loading && !error && assignments.length === 0 && <EmptyState />}
 
-        {/* Assignment grid */}
+        {/* Grid */}
+        {!loading && filtered.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+            {filtered.map(a => <AssignmentCard key={a._id} assignment={a} />)}
+          </div>
+        )}
+
+        {/* No search results */}
+        {!loading && assignments.length > 0 && filtered.length === 0 && (
+          <div className="text-center py-12 text-gray-400 text-sm">
+            No assignments match &ldquo;{search}&rdquo;
+          </div>
+        )}
+
+        {/* FAB — visible when there are assignments */}
         {!loading && assignments.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {assignments.map((a) => (
-              <AssignmentCard key={a._id} assignment={a} />
-            ))}
+          <div className="fixed bottom-6 right-6 no-print">
+            <Link href="/create" className="btn-primary rounded-full w-12 h-12 !p-0 flex items-center justify-center shadow-lg shadow-gray-900/20">
+              <Plus className="w-5 h-5" />
+            </Link>
           </div>
         )}
       </main>
