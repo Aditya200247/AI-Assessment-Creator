@@ -7,21 +7,26 @@ import {
 } from 'lucide-react';
 
 const navItems = [
-  { href: '/', label: 'Home', icon: Home, exact: true },
-  { href: '/groups', label: 'My Groups', icon: Users, exact: false },
-  { href: '/', label: 'Assignments', icon: ClipboardList, badge: '30', exact: true },
-  { href: '/create', label: "AI Teacher's Toolkit", icon: Wrench, exact: false },
-  { href: '/library', label: 'My Library', icon: BookOpen, exact: false },
+  { href: '/', label: 'Home', icon: Home, key: 'home' },
+  { href: '/groups', label: 'My Groups', icon: Users, key: 'groups' },
+  { href: '/', label: 'Assignments', icon: ClipboardList, badge: '30', key: 'assignments' },
+  { href: '/create', label: "AI Teacher's Toolkit", icon: Wrench, key: 'toolkit' },
+  { href: '/library', label: 'My Library', icon: BookOpen, key: 'library' },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
 
   const isActive = (item: typeof navItems[0]) => {
-    if (item.label === 'Assignments') return false;
-    if (item.label === 'Home') {
+    // Assignments is active on the dashboard and individual assignment pages
+    if (item.key === 'assignments') {
       return pathname === '/' || pathname.startsWith('/assignment/');
     }
+    // Home is never active (it links to same place as Assignments but isn't the active tab)
+    if (item.key === 'home') return false;
+    // Create page — toolkit active
+    if (item.key === 'toolkit') return pathname === '/create';
+    // Others by path prefix
     return pathname === item.href || pathname.startsWith(item.href + '/');
   };
 

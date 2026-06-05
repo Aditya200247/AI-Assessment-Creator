@@ -15,16 +15,15 @@ import { Assignment, AssignmentStatus } from '@/types';
 /* ── Top Bar ─────────────────────────────────────────── */
 function TopBar() {
   return (
-    <header className="flex items-center justify-between px-6 py-4 border-b border-gray-100 no-print flex-shrink-0">
-      <div className="flex items-center gap-2.5 text-sm font-semibold text-gray-800">
-        <span className="text-gray-400 text-lg cursor-pointer">←</span>
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-gray-500">
-          <rect x="3" y="3" width="7" height="7" rx="1" />
-          <rect x="14" y="3" width="7" height="7" rx="1" />
-          <rect x="3" y="14" width="7" height="7" rx="1" />
-          <rect x="14" y="14" width="7" height="7" rx="1" />
+    <header className="flex items-center justify-between px-6 py-3.5 border-b border-gray-100 no-print flex-shrink-0">
+      <div className="flex items-center gap-2 text-sm text-gray-500">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400 flex-shrink-0">
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
         </svg>
-        <span>Assignment</span>
+        <span className="text-gray-300">/</span>
+        <span className="text-gray-700 font-semibold">Assignment</span>
       </div>
       <div className="flex items-center gap-3">
         <button className="relative p-2 rounded-lg hover:bg-gray-50 transition-colors">
@@ -188,7 +187,7 @@ function EmptyState() {
         Create your first assignment to start collecting and grading student submissions.
         You can set up rubrics, define marking criteria, and let AI assist with grading.
       </p>
-      <Link href="/create" className="btn-primary px-6 py-3 text-sm">
+      <Link href="/create" className="inline-flex items-center gap-2 px-6 py-3 bg-[#1A1A2E] text-white rounded-[14px] text-sm font-semibold hover:bg-[#252550] transition-colors shadow-sm">
         <Plus className="w-4 h-4" />
         Create Your First Assignment
       </Link>
@@ -248,9 +247,9 @@ export default function DashboardPage() {
         {/* Filter + Search row */}
         {(loading || assignments.length > 0) && (
           <div className="flex items-center gap-3 mb-6">
-            <div className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-[12px] text-sm font-semibold text-gray-700 hover:bg-gray-50 cursor-pointer shadow-sm">
-              <Filter className="w-4 h-4 text-gray-500" />
-              <span>Filter</span>
+            <div className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-[12px] text-sm font-medium text-gray-600 hover:bg-gray-50 cursor-pointer shadow-sm">
+              <Filter className="w-4 h-4 text-gray-400" />
+              <span>Filtering</span>
             </div>
             <div className="flex items-center gap-2 flex-1 max-w-sm bg-white border border-gray-200 rounded-[12px] px-3.5 py-2 shadow-sm">
               <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
@@ -297,7 +296,7 @@ export default function DashboardPage() {
             </div>
             
             {/* Centered Pill Button matching Figma */}
-            <Link href="/create" className="btn-primary rounded-full px-6 py-2.5 shadow-md flex items-center gap-2 text-sm bg-black hover:bg-gray-800 text-white font-semibold">
+            <Link href="/create" className="inline-flex items-center gap-2 px-6 py-3 bg-[#1A1A2E] hover:bg-[#252550] text-white rounded-full text-sm font-semibold shadow-md transition-colors">
               <Plus className="w-4 h-4" />
               Create Assignment
             </Link>

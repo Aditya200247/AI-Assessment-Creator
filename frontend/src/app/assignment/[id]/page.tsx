@@ -29,12 +29,15 @@ function TopBar({ title, status, completed }: {
   title: string; status: string; completed: boolean;
 }) {
   return (
-    <header className="flex items-center justify-between px-6 py-4 border-b border-gray-100 no-print flex-shrink-0">
-      <div className="flex items-center gap-2 text-sm font-semibold text-gray-800">
-        <Link href="/" className="text-gray-400 hover:text-gray-700 transition-colors flex items-center gap-1.5">
-          <span>←</span>
-          <span>Assignment</span>
-        </Link>
+    <header className="flex items-center justify-between px-6 py-3.5 border-b border-gray-100 no-print flex-shrink-0">
+      <div className="flex items-center gap-2 text-sm text-gray-500">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400 flex-shrink-0">
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+        <span className="text-gray-300">/</span>
+        <Link href="/" className="text-gray-500 hover:text-gray-700 transition-colors">Assignment</Link>
       </div>
       <div className="flex items-center gap-3">
         <button className="relative p-2 rounded-lg hover:bg-gray-50 transition-colors">
@@ -78,9 +81,6 @@ function GeneratingSkeleton({ progress, message }: { progress: number; message: 
         <div className="skeleton h-28" />
         <div className="p-8 space-y-4">
           <div className="skeleton h-4 w-1/3 rounded" />
-          <div className="skeleton h-3 w-full rounded" />
-          <div className="skeleton h-3 w-5/6 rounded" />
-          <div className="skeleton h-3 w-4/6 rounded" />
         </div>
       </div>
     </div>
@@ -90,8 +90,8 @@ function GeneratingSkeleton({ progress, message }: { progress: number; message: 
 /* ── Failed state ────────────────────────────────────── */
 function FailedState({ onRetry, retrying }: { onRetry: () => void; retrying: boolean }) {
   return (
-    <div className="max-w-md mx-auto text-center py-16">
-      <div className="w-16 h-16 rounded-2xl bg-red-50 flex items-center justify-center mx-auto mb-4">
+    <div className="bg-white rounded-2xl border border-red-100 p-8 text-center max-w-md mx-auto">
+      <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
         <AlertCircle className="w-8 h-8 text-red-400" />
       </div>
       <h2 className="text-lg font-bold text-gray-900 mb-2">Generation Failed</h2>
@@ -144,7 +144,7 @@ export default function AssignmentOutputPage() {
   const assignment = currentAssignment;
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col h-full bg-white">
       <TopBar
         title={loading ? 'Loading…' : (assignment?.title ?? 'Assignment')}
         status={assignment?.status ?? ''}
@@ -176,7 +176,7 @@ export default function AssignmentOutputPage() {
         </div>
       )}
 
-      <main className="flex-1 p-6">
+      <main className="flex-1 overflow-y-auto p-6">
         {/* Loading */}
         {loading && (
           <div className="flex flex-col items-center justify-center py-20">

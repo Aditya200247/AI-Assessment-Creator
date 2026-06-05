@@ -15,12 +15,15 @@ import toast from 'react-hot-toast';
 /* ── Top Bar ─────────────────────────────────────────── */
 function TopBar() {
   return (
-    <header className="flex items-center justify-between px-6 py-4 border-b border-gray-100 no-print flex-shrink-0">
-      <div className="flex items-center gap-2 text-sm">
-        <Link href="/" className="text-gray-400 hover:text-gray-700 transition-colors flex items-center gap-1.5 font-semibold">
-          <span>←</span>
-          <span>Assignment</span>
-        </Link>
+    <header className="flex items-center justify-between px-6 py-3.5 border-b border-gray-100 no-print flex-shrink-0">
+      <div className="flex items-center gap-2 text-sm text-gray-500">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400 flex-shrink-0">
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+        <span className="text-gray-300">/</span>
+        <Link href="/" className="text-gray-500 hover:text-gray-700 transition-colors">Assignment</Link>
       </div>
       <div className="flex items-center gap-3">
         <button className="relative p-2 rounded-lg hover:bg-gray-50 transition-colors">
@@ -179,19 +182,19 @@ export default function CreateAssignmentPage() {
   const { totalQuestions, totalMarks } = getTotals();
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col h-full bg-white">
       <TopBar />
 
-      <main className="flex-1 p-6 max-w-2xl mx-auto w-full">
+      <main className="flex-1 overflow-y-auto py-6 px-6">
         {/* Page heading */}
-        <div className="mb-6 animate-fade-in-up">
-          <h1 className="text-xl font-bold text-gray-900">Create Assignment</h1>
-          <p className="text-gray-400 text-sm mt-0.5">
+        <div className="max-w-2xl mx-auto mb-6 animate-fade-in-up">
+          <h1 className="text-2xl font-bold text-gray-900">Create Assignment</h1>
+          <p className="text-gray-400 text-sm mt-1">
             Fill in the details to generate your custom question paper.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5 max-w-2xl mx-auto">
 
           {/* ── Assignment Details card ── */}
           <div className="bg-white rounded-2xl border border-gray-100 p-6 animate-fade-in-up-delay-1">
