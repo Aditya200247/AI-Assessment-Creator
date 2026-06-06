@@ -3,7 +3,7 @@
 A full-stack AI-powered exam paper generator. Teachers fill a form → backend queues an AI job → Gemini generates a structured question paper → frontend shows it in real-time via WebSocket.
 
 ## Live Demo
-- **Frontend**: [veda-ai-phi-ten.vercel.app](https://veda-ai-phi-ten.vercel.app)
+- **Frontend**: [ai-assessment-creator-frontend.up.railway.app](https://ai-assessment-creator-frontend.up.railway.app)
 - **Backend API**: [ai-assessment-creator-production-0164.up.railway.app](https://ai-assessment-creator-production-0164.up.railway.app)
 
 ---
